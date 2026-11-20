@@ -1,0 +1,302 @@
+<!DOCTYPE html>
+<html lang="ar">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>KAREEM</title>
+  <link href="https://fonts.googleapis.com/css2?family=Cinzel+Decorative:wght@700;900&family=UnifrakturMaguntia&display=swap" rel="stylesheet">
+  <style>
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+
+    body {
+      background: #000;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      height: 100vh;
+      overflow: hidden;
+      position: relative;
+    }
+
+    /* صورة الساموراي */
+    .bg-image {
+      position: fixed;
+      top: 0; left: 0;
+      width: 100%; height: 100%;
+      object-fit: cover;
+      z-index: 0;
+      animation: bgPulse 6s ease-in-out infinite;
+      filter: brightness(0.6) saturate(1.2);
+    }
+
+    @keyframes bgPulse {
+      0%   { transform: scale(1);    filter: brightness(0.60) saturate(1.2); }
+      50%  { transform: scale(1.03); filter: brightness(0.68) saturate(1.4); }
+      100% { transform: scale(1);    filter: brightness(0.60) saturate(1.2); }
+    }
+
+    /* طبقة تعتيم */
+    .overlay {
+      position: fixed;
+      top: 0; left: 0; width: 100%; height: 100%;
+      background: radial-gradient(ellipse at center,
+        rgba(0,0,0,0.05) 0%, rgba(0,0,0,0.6) 100%);
+      z-index: 1;
+    }
+
+    /* canvas */
+    canvas {
+      position: fixed;
+      top: 0; left: 0; width: 100%; height: 100%;
+      pointer-events: none;
+      z-index: 2;
+    }
+
+    /* ===== حاوية النصوص ===== */
+    .text-wrap {
+      position: relative;
+      z-index: 3;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      animation: float 3s ease-in-out infinite;
+    }
+
+    /* كلمة Programming فوق الاسم */
+    .label-top {
+      font-family: 'Cinzel Decorative', serif;
+      font-size: 1.1rem;
+      color: #aee8ff;
+      letter-spacing: 6px;
+      text-transform: uppercase;
+      text-shadow:
+        0 0 10px #60cfff,
+        0 0 25px #00aaff;
+      margin-bottom: 4px;
+    }
+
+    /* خط زخرفي */
+    .deco-line {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      margin-bottom: 2px;
+    }
+    .deco-line span {
+      font-size: 1.4rem;
+      color: #aee8ff;
+      text-shadow: 0 0 12px #00aaff;
+      animation: spinGlow 4s ease-in-out infinite;
+    }
+    .deco-line hr {
+      width: 80px;
+      border: none;
+      border-top: 1px solid rgba(174,232,255,0.4);
+    }
+
+    /* الاسم الرئيسي */
+    .name {
+      font-family: 'UnifrakturMaguntia', cursive;
+      font-size: 9rem;
+      font-weight: 900;
+      color: #fff;
+      letter-spacing: 18px;
+      user-select: none;
+      text-shadow:
+        0 0 8px  #fff,
+        0 0 20px #aee8ff,
+        0 0 45px #60cfff,
+        0 0 80px #00aaff,
+        3px  3px 0 #000,
+       -2px -2px 0 #000,
+        2px -2px 0 #000,
+       -2px  2px 0 #000;
+    }
+
+    /* سطر زخرفي تحت الاسم */
+    .deco-bottom {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      margin-top: 6px;
+    }
+    .deco-bottom span {
+      font-size: 1.6rem;
+      color: #aee8ff;
+      text-shadow: 0 0 12px #00aaff;
+      animation: spinGlow 4s ease-in-out infinite reverse;
+    }
+    .deco-bottom .dot {
+      font-size: 0.6rem;
+      color: rgba(174,232,255,0.6);
+    }
+
+    @keyframes spinGlow {
+      0%   { opacity: 0.5; transform: scale(1)   rotate(0deg);  }
+      50%  { opacity: 1;   transform: scale(1.3) rotate(12deg); }
+      100% { opacity: 0.5; transform: scale(1)   rotate(0deg);  }
+    }
+
+    @keyframes float {
+      0%   { transform: translateY(0px);   }
+      50%  { transform: translateY(-16px); }
+      100% { transform: translateY(0px);   }
+    }
+  </style>
+</head>
+<body>
+
+  <img class="bg-image" src="samurai-warrior-night-by-lake.jpg" alt="samurai" />
+  <div class="overlay"></div>
+  <canvas id="mainCanvas"></canvas>
+
+  <div class="text-wrap">
+
+    <!-- Programming فوق الاسم -->
+    <div class="label-top">✦ Programming ✦</div>
+
+    <!-- خط زخرفي علوي -->
+    <div class="deco-line">
+      <hr/><span>❧</span><span>⚜</span><span>❧</span><hr/>
+    </div>
+
+    <!-- الاسم -->
+    <div class="name">KAREEM</div>
+
+    <!-- زخرفة سفلية -->
+    <div class="deco-bottom">
+      <span>✦</span>
+      <span class="dot">◆ ◆ ◆</span>
+      <span>✦</span>
+    </div>
+
+  </div>
+
+  <script>
+    const canvas = document.getElementById('mainCanvas');
+    const ctx    = canvas.getContext('2d');
+
+    function resize() {
+      canvas.width  = window.innerWidth;
+      canvas.height = window.innerHeight;
+    }
+    resize();
+    window.addEventListener('resize', resize);
+
+    /* ===== توهج القمر ===== */
+    const moon = { phase: 0 };
+
+    function drawMoonGlow() {
+      const mx = canvas.width  * 0.50;
+      const my = canvas.height * 0.30;
+      const mr = Math.min(canvas.width, canvas.height) * 0.13;
+      moon.phase += 0.012;
+      const pulse = 1 + Math.sin(moon.phase) * 0.08;
+
+      [
+        { r: mr * 3.5 * pulse, a: 0.04 },
+        { r: mr * 2.5 * pulse, a: 0.08 },
+        { r: mr * 1.8 * pulse, a: 0.13 },
+        { r: mr * 1.3 * pulse, a: 0.20 },
+      ].forEach(l => {
+        const g = ctx.createRadialGradient(mx, my, mr * 0.5, mx, my, l.r);
+        g.addColorStop(0, `rgba(220,240,255,${l.a})`);
+        g.addColorStop(1,  'rgba(180,220,255,0)');
+        ctx.beginPath();
+        ctx.arc(mx, my, l.r, 0, Math.PI * 2);
+        ctx.fillStyle = g;
+        ctx.fill();
+      });
+    }
+
+    /* ===== قطرات الندى ===== */
+    class DewDrop {
+      constructor() { this.reset(true); }
+      reset(init) {
+        this.x     = Math.random() * canvas.width;
+        this.y     = init ? Math.random() * canvas.height : -15;
+        this.r     = Math.random() * 3 + 1.5;
+        this.speed = Math.random() * 0.5 + 0.15;
+        this.tail  = Math.random() * 20 + 8;
+        this.alpha = Math.random() * 0.45 + 0.15;
+        this.hue   = 180 + Math.floor(Math.random() * 40);
+      }
+      update() {
+        this.y += this.speed;
+        if (this.y - this.tail > canvas.height) this.reset(false);
+      }
+      draw() {
+        const gr = ctx.createLinearGradient(this.x, this.y - this.tail, this.x, this.y);
+        gr.addColorStop(0, `hsla(${this.hue},80%,75%,0)`);
+        gr.addColorStop(1, `hsla(${this.hue},80%,75%,${this.alpha})`);
+        ctx.beginPath();
+        ctx.moveTo(this.x, this.y - this.tail);
+        ctx.lineTo(this.x, this.y);
+        ctx.strokeStyle = gr;
+        ctx.lineWidth   = this.r * 0.5;
+        ctx.lineCap     = 'round';
+        ctx.stroke();
+
+        const glow = ctx.createRadialGradient(this.x, this.y, 0, this.x, this.y, this.r * 2.5);
+        glow.addColorStop(0, `hsla(${this.hue},100%,95%,${this.alpha})`);
+        glow.addColorStop(1, `hsla(${this.hue},80%,75%,0)`);
+        ctx.beginPath();
+        ctx.arc(this.x, this.y, this.r * 2.5, 0, Math.PI * 2);
+        ctx.fillStyle = glow;
+        ctx.fill();
+      }
+    }
+
+    /* ===== نقط الدم ===== */
+    class BloodDrop {
+      constructor() { this.reset(true); }
+      reset(init) {
+        this.x     = Math.random() * canvas.width;
+        this.y     = init ? Math.random() * canvas.height : -20;
+        this.r     = Math.random() * 5 + 2;
+        this.speed = Math.random() * 0.6 + 0.2;
+        this.tail  = Math.random() * 18 + 6;
+        this.alpha = Math.random() * 0.5 + 0.2;
+        const red  = 120 + Math.floor(Math.random() * 80);
+        this.color     = `rgba(${red},0,0,${this.alpha})`;
+        this.tailColor = `rgba(${red},0,0,0)`;
+      }
+      update() {
+        this.y += this.speed;
+        if (this.y - this.tail > canvas.height) this.reset(false);
+      }
+      draw() {
+        const gr = ctx.createLinearGradient(this.x, this.y - this.tail, this.x, this.y);
+        gr.addColorStop(0, this.tailColor);
+        gr.addColorStop(1, this.color);
+        ctx.beginPath();
+        ctx.moveTo(this.x, this.y - this.tail);
+        ctx.lineTo(this.x, this.y);
+        ctx.strokeStyle = gr;
+        ctx.lineWidth   = this.r * 0.6;
+        ctx.lineCap     = 'round';
+        ctx.stroke();
+
+        ctx.beginPath();
+        ctx.arc(this.x, this.y, this.r, 0, Math.PI * 2);
+        ctx.fillStyle = this.color;
+        ctx.fill();
+      }
+    }
+
+    const dewDrops   = Array.from({ length: 80 }, () => new DewDrop());
+    const bloodDrops = Array.from({ length: 40 }, () => new BloodDrop());
+
+    function animate() {
+      ctx.clearRect(0, 0, canvas.width, canvas.height);
+      drawMoonGlow();
+      dewDrops.forEach(d   => { d.update(); d.draw(); });
+      bloodDrops.forEach(d => { d.update(); d.draw(); });
+      requestAnimationFrame(animate);
+    }
+
+    animate();
+  </script>
+</body>
+</html>
